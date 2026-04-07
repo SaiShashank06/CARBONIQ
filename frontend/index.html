@@ -1,0 +1,2513 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoalCarbon IQ — India's Mine Carbon Intelligence Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --coal: #0a0c0f;
+            --deep: #0e1217;
+            --surface: #141820;
+            --panel: #1a2030;
+            --card: #1e2535;
+            --border: #2a3548;
+            --border-glow: #3d5a80;
+            --amber: #f4a261;
+            --amber-bright: #e76f51;
+            --green: #2ec4b6;
+            --green-bright: #26d9ca;
+            --gold: #ffd166;
+            --blue: #457b9d;
+            --blue-bright: #74b3ce;
+            --red: #e63946;
+            --text: #d4e0f0;
+            --muted: #7a9bb5;
+            --faint: #3d5270;
+            --glow-amber: rgba(244, 162, 97, 0.15);
+            --glow-green: rgba(46, 196, 182, 0.15);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--coal);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Particle Canvas ──────────────────────────────────────────── */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        /* ── Header ────────────────────────────────────────────────────── */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 12, 15, 0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--amber), var(--amber-bright));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 0 20px rgba(244, 162, 97, 0.4);
+            animation: pulse-amber 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-amber {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(244, 162, 97, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 35px rgba(244, 162, 97, 0.7);
+            }
+        }
+
+        .logo-text {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.3rem;
+            letter-spacing: -0.02em;
+        }
+
+        .logo-text span {
+            color: var(--amber);
+        }
+
+        .logo-sub {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--muted);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            display: block;
+            margin-top: -2px;
+        }
+
+        nav {
+            display: flex;
+            gap: 4px;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .nav-btn:hover {
+            color: var(--text);
+            background: var(--surface);
+        }
+
+        .nav-btn.active {
+            color: var(--amber);
+            background: var(--glow-amber);
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--green);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(46, 196, 182, 0.3);
+            background: rgba(46, 196, 182, 0.08);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        /* ── Main Layout ────────────────────────────────────────────────── */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Sections ────────────────────────────────────────────────────── */
+        .section {
+            display: none;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── Hero ────────────────────────────────────────────────────────── */
+        .hero {
+            padding: 5rem 0 3rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 300px;
+            background: radial-gradient(ellipse, rgba(244, 162, 97, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--amber);
+            border: 1px solid rgba(244, 162, 97, 0.3);
+            background: rgba(244, 162, 97, 0.06);
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 .accent {
+            color: var(--amber);
+        }
+
+        .hero h1 .accent2 {
+            color: var(--green);
+        }
+
+        .hero-desc {
+            font-size: 1.15rem;
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--amber), var(--amber-bright));
+            color: #0a0c0f;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 32px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 4px 25px rgba(244, 162, 97, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -75%;
+            width: 50%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: skewX(-15deg);
+            transition: left 0.4s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 35px rgba(244, 162, 97, 0.5);
+        }
+
+        .btn-primary:hover::after {
+            left: 150%;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 32px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--amber);
+            color: var(--amber);
+            background: var(--glow-amber);
+        }
+
+        /* ── Stats Row ────────────────────────────────────────────────────── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 3rem 0;
+            border: 1px solid var(--border);
+        }
+
+        .stat-cell {
+            background: var(--surface);
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+
+        .stat-cell:hover {
+            background: var(--panel);
+        }
+
+        .stat-cell::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--amber), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .stat-cell:hover::before {
+            opacity: 1;
+        }
+
+        .stat-val {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--amber);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        /* ── Section Title ────────────────────────────────────────────────── */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 2rem 0 0;
+        }
+
+        .section-header h2 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+
+        .section-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--amber);
+            background: rgba(244, 162, 97, 0.08);
+            border: 1px solid rgba(244, 162, 97, 0.2);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        /* ── Form Grid ────────────────────────────────────────────────────── */
+        .form-stepper {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 6px;
+            overflow-x: auto;
+        }
+
+        .step-btn {
+            flex: 1;
+            min-width: 120px;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 10px 16px;
+            border-radius: 6px;
+            transition: all 0.25s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .step-btn:hover {
+            color: var(--text);
+            background: var(--panel);
+        }
+
+        .step-btn.active {
+            color: var(--coal);
+            background: var(--amber);
+            font-weight: 700;
+        }
+
+        .step-num {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-btn.active .step-num {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* ── Form Step Panels ─────────────────────────────────────────────── */
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+        }
+
+        .form-group label .unit {
+            font-weight: 400;
+            color: var(--faint);
+            text-transform: lowercase;
+            letter-spacing: 0;
+        }
+
+        .form-control {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            padding: 12px 16px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .form-control:focus {
+            border-color: var(--amber);
+            box-shadow: 0 0 0 3px rgba(244, 162, 97, 0.1);
+            background: var(--card);
+        }
+
+        .form-control:hover {
+            border-color: var(--border-glow);
+        }
+
+        select.form-control {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237a9bb5' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 40px;
+        }
+
+        select.form-control option {
+            background: var(--panel);
+            color: var(--text);
+        }
+
+        .form-hint {
+            font-size: 0.72rem;
+            color: var(--faint);
+        }
+
+        .form-section-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--green);
+            margin: 1.5rem 0 1rem;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(46, 196, 182, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-section-title::before {
+            content: '';
+            width: 12px;
+            height: 2px;
+            background: var(--green);
+        }
+
+        /* ── Action Row ──────────────────────────────────────────────────── */
+        .action-row {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            align-items: center;
+        }
+
+        /* ── Results Dashboard ────────────────────────────────────────────── */
+        .results-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        /* ── KPI Cards ───────────────────────────────────────────────────── */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .kpi-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.25s, border-color 0.25s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--border-glow);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .kpi-card.amber::before {
+            background: linear-gradient(90deg, var(--amber), var(--amber-bright));
+        }
+
+        .kpi-card.green::before {
+            background: linear-gradient(90deg, var(--green), var(--green-bright));
+        }
+
+        .kpi-card.red::before {
+            background: linear-gradient(90deg, var(--red), #ff6b6b);
+        }
+
+        .kpi-card.blue::before {
+            background: linear-gradient(90deg, var(--blue), var(--blue-bright));
+        }
+
+        .kpi-card.gold::before {
+            background: linear-gradient(90deg, var(--gold), #ffa500);
+        }
+
+        .kpi-icon {
+            font-size: 1.6rem;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .kpi-val {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.9rem;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .kpi-card.amber .kpi-val {
+            color: var(--amber);
+        }
+
+        .kpi-card.green .kpi-val {
+            color: var(--green);
+        }
+
+        .kpi-card.red .kpi-val {
+            color: var(--red);
+        }
+
+        .kpi-card.blue .kpi-val {
+            color: var(--blue-bright);
+        }
+
+        .kpi-card.gold .kpi-val {
+            color: var(--gold);
+        }
+
+        .kpi-unit {
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-weight: 500;
+            letter-spacing: 0.05em;
+        }
+
+        .kpi-label {
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        /* ── Charts Panel ─────────────────────────────────────────────────── */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .chart-panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .chart-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-title .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 240px;
+        }
+
+        /* ── Gap Analysis ─────────────────────────────────────────────────── */
+        .gap-panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .gap-bar-wrap {
+            margin: 1.5rem 0;
+        }
+
+        .gap-bar-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 8px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .gap-bar {
+            height: 24px;
+            background: var(--surface);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .gap-bar-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .gap-bar-fill.safe {
+            background: linear-gradient(90deg, var(--green), var(--green-bright));
+        }
+
+        .gap-bar-fill.warn {
+            background: linear-gradient(90deg, var(--gold), var(--amber));
+        }
+
+        .gap-bar-fill.danger {
+            background: linear-gradient(90deg, var(--amber-bright), var(--red));
+        }
+
+        .gap-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .gap-status.safe {
+            color: var(--green);
+            background: rgba(46, 196, 182, 0.1);
+            border: 1px solid rgba(46, 196, 182, 0.3);
+        }
+
+        .gap-status.warn {
+            color: var(--gold);
+            background: rgba(255, 209, 102, 0.1);
+            border: 1px solid rgba(255, 209, 102, 0.3);
+        }
+
+        .gap-status.danger {
+            color: var(--red);
+            background: rgba(230, 57, 70, 0.1);
+            border: 1px solid rgba(230, 57, 70, 0.3);
+        }
+
+        /* ── Recommendations ──────────────────────────────────────────────── */
+        .rec-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .rec-card {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 1rem;
+            align-items: center;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem;
+            transition: border-color 0.25s;
+        }
+
+        .rec-card:hover {
+            border-color: var(--border-glow);
+        }
+
+        .rec-priority {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 4px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .rec-priority.HIGH {
+            color: var(--red);
+            background: rgba(230, 57, 70, 0.1);
+            border: 1px solid rgba(230, 57, 70, 0.2);
+        }
+
+        .rec-priority.MEDIUM {
+            color: var(--gold);
+            background: rgba(255, 209, 102, 0.1);
+            border: 1px solid rgba(255, 209, 102, 0.2);
+        }
+
+        .rec-priority.LOW {
+            color: var(--green);
+            background: rgba(46, 196, 182, 0.1);
+            border: 1px solid rgba(46, 196, 182, 0.2);
+        }
+
+        .rec-category {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .rec-action {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .rec-meta {
+            text-align: right;
+            font-size: 0.8rem;
+            color: var(--muted);
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* ── Pathway Cards ────────────────────────────────────────────────── */
+        .pathway-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .pathway-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.25s, border-color 0.25s;
+        }
+
+        .pathway-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--amber);
+        }
+
+        .pathway-head {
+            padding: 1.25rem 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pathway-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .pathway-name {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .pathway-body {
+            padding: 1.25rem;
+        }
+
+        .pathway-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.85rem;
+        }
+
+        .pathway-stat:last-child {
+            border-bottom: none;
+        }
+
+        .pathway-stat .key {
+            color: var(--muted);
+        }
+
+        .pathway-stat .val {
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        .pathway-stat .val.green {
+            color: var(--green);
+        }
+
+        .pathway-stat .val.amber {
+            color: var(--amber);
+        }
+
+        .pathway-stat .val.red {
+            color: var(--red);
+        }
+
+        .reduction-bar {
+            margin-top: 1rem;
+            height: 6px;
+            background: var(--surface);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .reduction-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--green), var(--green-bright));
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ── Carbon Credit Panel ──────────────────────────────────────────── */
+        .credit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+
+        .credit-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border-top: 3px solid var(--gold);
+            transition: transform 0.25s;
+        }
+
+        .credit-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .credit-market {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .credit-revenue {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.6rem;
+            color: var(--gold);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .credit-rate {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        /* ── Loading ──────────────────────────────────────────────────────── */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            background: rgba(10, 12, 15, 0.85);
+            backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 3px solid var(--border);
+            border-top-color: var(--amber);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--amber);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            animation: loadingPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes loadingPulse {
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* ── Toast ───────────────────────────────────────────────────────── */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            min-width: 300px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(120%);
+            transition: transform 0.35s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            border-left: 3px solid var(--red);
+        }
+
+        .toast.success {
+            border-left: 3px solid var(--green);
+        }
+
+        .toast-icon {
+            font-size: 1.4rem;
+        }
+
+        .toast-msg {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* ── Responsive ──────────────────────────────────────────────────── */
+        @media (max-width: 900px) {
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header-inner {
+                gap: 1rem;
+            }
+
+            nav {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* ── Scrollbar ──────────────────────────────────────────────────── */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--coal);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--faint);
+        }
+
+        /* ── Mine Illustration ────────────────────────────────────────────── */
+        .mine-svg-wrap {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .mine-svg-wrap svg {
+            width: 100%;
+            max-width: 700px;
+            height: auto;
+        }
+
+        /* ── Info Boxes ────────────────────────────────────────────────────── */
+        .info-box {
+            background: rgba(46, 196, 182, 0.06);
+            border: 1px solid rgba(46, 196, 182, 0.2);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            font-size: 0.88rem;
+            color: var(--muted);
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .info-box .info-icon {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        /* Scope tabs */
+        .scope-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .scope-tab {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .scope-tab.active {
+            background: var(--amber);
+            color: var(--coal);
+            border-color: var(--amber);
+        }
+
+        /* Emission breakdown table */
+        .emission-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .emission-table th {
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+        }
+
+        .emission-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .emission-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .emission-table .amount {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            text-align: right;
+            color: var(--amber);
+        }
+
+        .emission-table .pct {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            text-align: right;
+            color: var(--muted);
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="particles"></canvas>
+
+    <!-- ── Loading Overlay ──────────────────────────────────────────── -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader"></div>
+        <p class="loading-text">Calculating emissions...</p>
+    </div>
+
+    <!-- ── Toast ────────────────────────────────────────────────────── -->
+    <div class="toast" id="toast">
+        <span class="toast-icon" id="toastIcon">✅</span>
+        <span class="toast-msg" id="toastMsg">Success</span>
+    </div>
+
+    <!-- ── Header ───────────────────────────────────────────────────── -->
+    <header>
+        <div class="header-inner">
+            <div class="logo">
+                <div class="logo-icon">⛏️</div>
+                <div>
+                    <div class="logo-text">Coal<span>Carbon</span> IQ</div>
+                    <span class="logo-sub">India Carbon Intelligence Platform</span>
+                </div>
+            </div>
+            <nav>
+                <button class="nav-btn active" onclick="showSection('home')">Home</button>
+                <button class="nav-btn" onclick="showSection('calculator')">Calculator</button>
+                <button class="nav-btn" onclick="showSection('results')" id="resultsNavBtn">Results</button>
+                <button class="nav-btn" onclick="showSection('pathways')" id="pathwaysNavBtn">Pathways</button>
+            </nav>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                API Active
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- ══ HOME SECTION ═══════════════════════════════════════════════ -->
+        <section class="section active" id="section-home">
+
+            <div class="hero">
+                <div class="hero-tag">🌿 Carbon Neutrality Intelligence · India 2030</div>
+                <h1>Quantify. Analyze.<br><span class="accent">Neutralize</span> <span class="accent2">Carbon.</span>
+                </h1>
+                <p class="hero-desc">
+                    India's most comprehensive carbon intelligence platform for coal mines.
+                    Activity-wise emission quantification, sink analysis, and AI-powered
+                    pathways to carbon neutrality.
+                </p>
+                <div class="hero-cta">
+                    <button class="btn-primary" onclick="showSection('calculator')">Start Analysis →</button>
+                    <button class="btn-secondary" onclick="loadDemo()">Load Demo Mine</button>
+                </div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-cell">
+                    <div class="stat-val">756M</div>
+                    <div class="stat-label">Tonnes Coal Produced (India/yr)</div>
+                </div>
+                <div class="stat-cell">
+                    <div class="stat-val">2.1B</div>
+                    <div class="stat-label">tCO₂e from Mining Sector</div>
+                </div>
+                <div class="stat-cell">
+                    <div class="stat-val">2070</div>
+                    <div class="stat-label">India Net-Zero Target Year</div>
+                </div>
+                <div class="stat-cell">
+                    <div class="stat-val">₹8</div>
+                    <div class="stat-label">Carbon Credit Rate /tCO₂ (ICM)</div>
+                </div>
+            </div>
+
+            <div class="mine-svg-wrap">
+                <svg viewBox="0 0 700 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Sky gradient -->
+                    <defs>
+                        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#0e1217" />
+                            <stop offset="100%" stop-color="#141820" />
+                        </linearGradient>
+                        <linearGradient id="coalGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#2a3548" />
+                            <stop offset="100%" stop-color="#141820" />
+                        </linearGradient>
+                        <linearGradient id="amberGrad" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stop-color="#f4a261" />
+                            <stop offset="100%" stop-color="#e76f51" />
+                        </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <rect width="700" height="220" fill="url(#skyGrad)" rx="12" />
+
+                    <!-- Ground layers -->
+                    <path d="M0 160 Q175 140 350 155 Q525 170 700 150 L700 220 L0 220Z" fill="#1a2030" />
+                    <path d="M0 175 Q175 158 350 168 Q525 178 700 165 L700 220 L0 220Z" fill="#141820" />
+
+                    <!-- Conveyor belt -->
+                    <rect x="80" y="130" width="200" height="8" rx="4" fill="#2a3548" />
+                    <rect x="80" y="131" width="200" height="3" rx="2" fill="url(#amberGrad)" opacity="0.6" />
+
+                    <!-- Excavator -->
+                    <rect x="40" y="115" width="70" height="45" rx="4" fill="#1a2030" stroke="#2a3548"
+                        stroke-width="1.5" />
+                    <rect x="48" y="120" width="54" height="32" rx="3" fill="#141820" />
+                    <rect x="100" y="105" width="8" height="30" rx="2" fill="#2a3548" stroke="#3d5270"
+                        stroke-width="1" />
+                    <rect x="94" y="95" width="20" height="14" rx="2" fill="#2a3548" stroke="#3d5270"
+                        stroke-width="1" />
+                    <!-- Cab window -->
+                    <rect x="54" y="124" width="20" height="14" rx="2" fill="#0e3a5c" opacity="0.8" />
+
+                    <!-- Coal pile -->
+                    <ellipse cx="160" cy="160" rx="50" ry="12" fill="#1e2535" />
+                    <ellipse cx="160" cy="155" rx="40" ry="10" fill="#2a3548" />
+                    <ellipse cx="160" cy="152" rx="30" ry="7" fill="#3d5270" />
+
+                    <!-- Dump truck -->
+                    <rect x="280" y="130" width="90" height="35" rx="5" fill="#1a2030" stroke="#2a3548"
+                        stroke-width="1.5" />
+                    <rect x="280" y="115" width="40" height="20" rx="4" fill="#1e2535" stroke="#2a3548"
+                        stroke-width="1.5" />
+                    <rect x="286" y="118" width="28" height="13" rx="2" fill="#0e3a5c" opacity="0.8" />
+                    <circle cx="295" cy="167" r="8" fill="#141820" stroke="#3d5270" stroke-width="2" />
+                    <circle cx="295" cy="167" r="4" fill="#2a3548" />
+                    <circle cx="355" cy="167" r="8" fill="#141820" stroke="#3d5270" stroke-width="2" />
+                    <circle cx="355" cy="167" r="4" fill="#2a3548" />
+
+                    <!-- Chimney / stacks -->
+                    <rect x="430" y="80" width="20" height="80" rx="3" fill="#1e2535" stroke="#2a3548"
+                        stroke-width="1.5" />
+                    <rect x="460" y="100" width="16" height="60" rx="3" fill="#1e2535" stroke="#2a3548"
+                        stroke-width="1.5" />
+                    <!-- Smoke -->
+                    <circle cx="440" cy="72" r="10" fill="#2a3548" opacity="0.5" />
+                    <circle cx="450" cy="60" r="13" fill="#2a3548" opacity="0.35" />
+                    <circle cx="458" cy="48" r="15" fill="#2a3548" opacity="0.2" />
+                    <circle cx="468" cy="90" r="9" fill="#2a3548" opacity="0.45" />
+                    <circle cx="475" cy="78" r="11" fill="#2a3548" opacity="0.3" />
+
+                    <!-- Solar panel (green alternative) -->
+                    <rect x="530" y="120" width="60" height="35" rx="2" fill="#0e3a5c" stroke="#2ec4b6"
+                        stroke-width="1.5" filter="url(#glow)" />
+                    <line x1="530" y1="132" x2="590" y2="132" stroke="#2ec4b6" stroke-width="0.8" opacity="0.6" />
+                    <line x1="530" y1="144" x2="590" y2="144" stroke="#2ec4b6" stroke-width="0.8" opacity="0.6" />
+                    <line x1="560" y1="120" x2="560" y2="155" stroke="#2ec4b6" stroke-width="0.8" opacity="0.6" />
+                    <rect x="557" y="152" width="6" height="8" fill="#1a2030" />
+
+                    <!-- Trees -->
+                    <g filter="url(#glow)">
+                        <polygon points="610,100 625,135 595,135" fill="#1e4d2b" stroke="#2ec4b6" stroke-width="0.5" />
+                        <rect x="610" y="133" width="6" height="8" fill="#3d5270" />
+                        <polygon points="635,110 648,140 622,140" fill="#1e4d2b" stroke="#2ec4b6" stroke-width="0.5" />
+                        <rect x="635" y="138" width="5" height="7" fill="#3d5270" />
+                        <polygon points="655,105 670,140 640,140" fill="#1e4d2b" stroke="#2ec4b6" stroke-width="0.5" />
+                        <rect x="654" y="138" width="6" height="7" fill="#3d5270" />
+                    </g>
+
+                    <!-- Labels -->
+                    <text x="75" y="110" fill="#7a9bb5" font-size="8" font-family="monospace">EXCAVATOR</text>
+                    <text x="288" y="110" fill="#7a9bb5" font-size="8" font-family="monospace">DUMP TRUCK</text>
+                    <text x="425" y="74" fill="#7a9bb5" font-size="8" font-family="monospace">EMISSIONS</text>
+                    <text x="528" y="115" fill="#2ec4b6" font-size="8" font-family="monospace">SOLAR</text>
+                    <text x="604" y="96" fill="#2ec4b6" font-size="8" font-family="monospace">AFFORESTATION</text>
+
+                    <!-- CO2 particle animation hint -->
+                    <circle cx="440" cy="42" r="3" fill="#e76f51" opacity="0.7" />
+                    <circle cx="455" cy="30" r="2" fill="#e76f51" opacity="0.5" />
+                    <circle cx="462" cy="20" r="2.5" fill="#e76f51" opacity="0.3" />
+
+                    <!-- Emission flow arrow -->
+                    <path d="M200 90 Q300 60 420 75" stroke="#e76f51" stroke-width="1.5" stroke-dasharray="4 4"
+                        fill="none" opacity="0.5" />
+                    <polygon points="420,72 428,75 420,78" fill="#e76f51" opacity="0.5" />
+
+                    <!-- Offset flow arrow -->
+                    <path d="M580 90 Q620 70 655 65" stroke="#2ec4b6" stroke-width="1.5" stroke-dasharray="4 4"
+                        fill="none" opacity="0.5" />
+                </svg>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 2rem;">
+                <div class="kpi-card amber" style="cursor:pointer" onclick="showSection('calculator')">
+                    <span class="kpi-icon">📊</span>
+                    <div class="kpi-label">Emission Calculator</div>
+                    <p style="font-size:0.85rem; color:var(--muted); margin-top:8px; line-height:1.6;">
+                        Activity-wise carbon quantification across Scope 1, 2 & 3 with fugitive methane.
+                    </p>
+                </div>
+                <div class="kpi-card green" style="cursor:pointer" onclick="showSection('calculator')">
+                    <span class="kpi-icon">🌱</span>
+                    <div class="kpi-label">Carbon Sink Analysis</div>
+                    <p style="font-size:0.85rem; color:var(--muted); margin-top:8px; line-height:1.6;">
+                        State-specific afforestation rates, mine restoration, and solar offset calculations.
+                    </p>
+                </div>
+                <div class="kpi-card gold" style="cursor:pointer" onclick="showSection('calculator')">
+                    <span class="kpi-icon">💰</span>
+                    <div class="kpi-label">Carbon Credit Revenue</div>
+                    <p style="font-size:0.85rem; color:var(--muted); margin-top:8px; line-height:1.6;">
+                        Estimate revenue from VCS, Gold Standard, and Indian Carbon Market schemes.
+                    </p>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ══ CALCULATOR SECTION ══════════════════════════════════════════ -->
+        <section class="section" id="section-calculator">
+
+            <div class="section-header">
+                <span class="section-label">Step 01</span>
+                <h2>Mine Data Input</h2>
+            </div>
+
+            <div class="info-box">
+                <span class="info-icon">ℹ️</span>
+                <span>Fill in your mine's activity data across all steps. Emission factors are based on IPCC 2006
+                    Guidelines and MoEFCC India standards. Leave fields blank if data is not applicable.</span>
+            </div>
+
+            <div class="form-stepper">
+                <button class="step-btn active" id="stepBtn0" onclick="goStep(0)">
+                    <span class="step-num">1</span> Mine Profile
+                </button>
+                <button class="step-btn" id="stepBtn1" onclick="goStep(1)">
+                    <span class="step-num">2</span> Energy & Fuel
+                </button>
+                <button class="step-btn" id="stepBtn2" onclick="goStep(2)">
+                    <span class="step-num">3</span> Operations
+                </button>
+                <button class="step-btn" id="stepBtn3" onclick="goStep(3)">
+                    <span class="step-num">4</span> Transport
+                </button>
+                <button class="step-btn" id="stepBtn4" onclick="goStep(4)">
+                    <span class="step-num">5</span> Carbon Sinks
+                </button>
+            </div>
+
+            <!-- Step 0: Mine Profile -->
+            <div class="form-step active" id="step-0">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Mine Name</label>
+                        <input class="form-control" id="mineName" type="text"
+                            placeholder="e.g., Jharia Coalfields Unit 3">
+                    </div>
+                    <div class="form-group">
+                        <label>State / Location</label>
+                        <select class="form-control" id="state">
+                            <option value="">— Select State —</option>
+                            <option value="jharkhand">Jharkhand</option>
+                            <option value="chhattisgarh">Chhattisgarh</option>
+                            <option value="odisha">Odisha</option>
+                            <option value="madhya_pradesh">Madhya Pradesh</option>
+                            <option value="west_bengal">West Bengal</option>
+                            <option value="telangana">Telangana</option>
+                            <option value="andhra_pradesh">Andhra Pradesh</option>
+                            <option value="maharashtra">Maharashtra</option>
+                            <option value="rajasthan">Rajasthan</option>
+                            <option value="uttar_pradesh">Uttar Pradesh</option>
+                            <option value="assam">Assam</option>
+                            <option value="meghalaya">Meghalaya</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Mine Type</label>
+                        <select class="form-control" id="mineType">
+                            <option value="opencast">Open Cast</option>
+                            <option value="underground">Underground</option>
+                            <option value="mixed">Mixed (OC + UG)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Annual Coal Production <span class="unit">(tonnes/year)</span></label>
+                        <input class="form-control" id="annualProduction" type="number" placeholder="e.g., 5000000">
+                    </div>
+                    <div class="form-group">
+                        <label>Number of Workers</label>
+                        <input class="form-control" id="numberOfWorkers" type="number" placeholder="e.g., 2500">
+                    </div>
+                    <div class="form-group">
+                        <label>Overburden Removed <span class="unit">(m³/year)</span></label>
+                        <input class="form-control" id="overburdenRemoved" type="number" placeholder="e.g., 25000000">
+                        <span class="form-hint">Applicable for open-cast mines</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 1: Energy & Fuel -->
+            <div class="form-step" id="step-1">
+                <div class="form-section-title">Fuel Consumption</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Diesel Consumption <span class="unit">(liters/year)</span></label>
+                        <input class="form-control" id="dieselConsumption" type="number" placeholder="e.g., 12000000">
+                    </div>
+                    <div class="form-group">
+                        <label>Coal Burned On-site <span class="unit">(tonnes/year)</span></label>
+                        <input class="form-control" id="coalBurnedOnsite" type="number" placeholder="e.g., 500">
+                        <span class="form-hint">For on-site power generation or heating</span>
+                    </div>
+                </div>
+
+                <div class="form-section-title">Electricity Consumption</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Grid Electricity <span class="unit">(kWh/year)</span></label>
+                        <input class="form-control" id="electricityConsumption" type="number"
+                            placeholder="e.g., 85000000">
+                    </div>
+                    <div class="form-group">
+                        <label>Ventilation Fan Power <span class="unit">(kW)</span></label>
+                        <input class="form-control" id="ventilationKw" type="number" placeholder="e.g., 5000">
+                    </div>
+                    <div class="form-group">
+                        <label>Ventilation Operating Hours <span class="unit">(hrs/year)</span></label>
+                        <input class="form-control" id="ventilationHours" type="number" placeholder="e.g., 8000">
+                    </div>
+                </div>
+
+                <div class="form-section-title">Renewable Energy (if any)</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Solar Installed Capacity <span class="unit">(kW)</span></label>
+                        <input class="form-control" id="solarCapacityKw" type="number" placeholder="e.g., 2000">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Operations -->
+            <div class="form-step" id="step-2">
+                <div class="form-section-title">Blasting & Explosives</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Explosives Used (ANFO) <span class="unit">(kg/year)</span></label>
+                        <input class="form-control" id="explosivesUsed" type="number" placeholder="e.g., 300000">
+                    </div>
+                </div>
+
+                <div class="form-section-title">Coal Processing</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Coal Washed <span class="unit">(tonnes/year)</span></label>
+                        <input class="form-control" id="coalWashed" type="number" placeholder="e.g., 2000000">
+                    </div>
+                </div>
+
+                <div class="form-section-title">Fugitive Methane Emissions</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Methane Vented / Drained <span class="unit">(m³/year)</span></label>
+                        <input class="form-control" id="methaneVented" type="number" placeholder="e.g., 50000000">
+                        <span class="form-hint">From coal mine methane drainage systems</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Transport -->
+            <div class="form-step" id="step-3">
+                <div class="form-section-title">Internal Mine Transportation</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Internal Transport <span class="unit">(tonne-km/year)</span></label>
+                        <input class="form-control" id="internalTransportTonneKm" type="number"
+                            placeholder="e.g., 50000000">
+                        <span class="form-hint">Overburden + coal moved within mine by trucks/conveyor</span>
+                    </div>
+                </div>
+
+                <div class="form-section-title">External Coal Dispatch</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Road Transport <span class="unit">(tonne-km/year)</span></label>
+                        <input class="form-control" id="externalTransportTonneKm" type="number"
+                            placeholder="e.g., 100000000">
+                    </div>
+                    <div class="form-group">
+                        <label>Rail Transport <span class="unit">(tonne-km/year)</span></label>
+                        <input class="form-control" id="railTransportTonneKm" type="number"
+                            placeholder="e.g., 500000000">
+                    </div>
+                </div>
+
+                <div class="form-section-title">Vehicle Fleet</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Number of Diesel Vehicles</label>
+                        <input class="form-control" id="numVehicles" type="number" placeholder="e.g., 150">
+                        <span class="form-hint">Used for EV pathway simulation</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Carbon Sinks -->
+            <div class="form-step" id="step-4">
+                <div class="form-section-title">Existing Green Cover</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Existing Forest Area <span class="unit">(hectares)</span></label>
+                        <input class="form-control" id="existingForestArea" type="number" placeholder="e.g., 500">
+                    </div>
+                    <div class="form-group">
+                        <label>Green Belt Area <span class="unit">(hectares)</span></label>
+                        <input class="form-control" id="greenBeltArea" type="number" placeholder="e.g., 200">
+                    </div>
+                </div>
+
+                <div class="form-section-title">Active Plantation / Restoration</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>New Plantation Area <span class="unit">(hectares)</span></label>
+                        <input class="form-control" id="plantationArea" type="number" placeholder="e.g., 1000">
+                    </div>
+                    <div class="form-group">
+                        <label>Mine Restoration Area <span class="unit">(hectares)</span></label>
+                        <input class="form-control" id="mineRestorationArea" type="number" placeholder="e.g., 300">
+                        <span class="form-hint">Reclaimed/mined-out land converted to forest</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-row">
+                <button class="btn-secondary" id="prevBtn" onclick="prevStep()" style="display:none">← Previous</button>
+                <button class="btn-secondary" id="nextBtn" onclick="nextStep()">Next →</button>
+                <button class="btn-primary" id="calcBtn" onclick="runFullAnalysis()" style="display:none">
+                    ⚡ Calculate Now
+                </button>
+            </div>
+
+        </section>
+
+        <!-- ══ RESULTS SECTION ════════════════════════════════════════════ -->
+        <section class="section" id="section-results">
+
+            <div class="section-header">
+                <span class="section-label">Analysis</span>
+                <h2>Emission Report</h2>
+                <div id="summaryBadge" style="margin-left: auto;"></div>
+            </div>
+
+            <div id="results-content">
+                <p style="color:var(--muted); text-align:center; padding: 4rem;">Run the calculator first to see
+                    results.</p>
+            </div>
+
+        </section>
+
+        <!-- ══ PATHWAYS SECTION ═══════════════════════════════════════════ -->
+        <section class="section" id="section-pathways">
+
+            <div class="section-header">
+                <span class="section-label">Strategies</span>
+                <h2>Carbon Neutrality Pathways</h2>
+            </div>
+
+            <div id="pathways-content">
+                <p style="color:var(--muted); text-align:center; padding: 4rem;">Run the calculator first to see pathway
+                    simulations.</p>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        // ── CONFIG ───────────────────────────────────────────────────────────
+        const API_BASE = 'http://localhost:3001/api';
+
+        // ── PARTICLES ────────────────────────────────────────────────────────
+        (function initParticles() {
+            const canvas = document.getElementById('particles');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            for (let i = 0; i < 60; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 1.5 + 0.3,
+                    dx: (Math.random() - 0.5) * 0.3,
+                    dy: -Math.random() * 0.4 - 0.1,
+                    alpha: Math.random() * 0.5 + 0.1,
+                    color: Math.random() > 0.5 ? '244,162,97' : '46,196,182'
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.dx; p.y += p.dy;
+                    if (p.y < -5) p.y = canvas.height + 5;
+                    if (p.x < -5) p.x = canvas.width + 5;
+                    if (p.x > canvas.width + 5) p.x = -5;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${p.color},${p.alpha})`;
+                    ctx.fill();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        })();
+
+        // ── NAV ──────────────────────────────────────────────────────────────
+        function showSection(name) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`section-${name}`).classList.add('active');
+            const btns = document.querySelectorAll('.nav-btn');
+            btns.forEach(b => { if (b.getAttribute('onclick') === `showSection('${name}')`) b.classList.add('active'); });
+        }
+        
+
+        // ── FORM STEPPER ─────────────────────────────────────────────────────
+        let currentStep = 0;
+        const totalSteps = 5;
+
+        function goStep(step) {
+            document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.step-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step-${step}`).classList.add('active');
+            document.getElementById(`stepBtn${step}`).classList.add('active');
+            currentStep = step;
+            document.getElementById('prevBtn').style.display = step > 0 ? 'block' : 'none';
+            document.getElementById('nextBtn').style.display = step < totalSteps - 1 ? 'block' : 'none';
+            document.getElementById('calcBtn').style.display = step === totalSteps - 1 ? 'block' : 'none';
+        }
+
+        function nextStep() { if (currentStep < totalSteps - 1) goStep(currentStep + 1); }
+        function prevStep() { if (currentStep > 0) goStep(currentStep - 1); }
+
+        // ── TOAST ────────────────────────────────────────────────────────────
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            document.getElementById('toastIcon').textContent = type === 'success' ? '✅' : '❌';
+            t.className = `toast ${type} show`;
+            setTimeout(() => t.classList.remove('show'), 3500);
+        }
+
+        // ── LOAD DEMO ────────────────────────────────────────────────────────
+        function loadDemo() {
+            const demoData = {
+                mineName: 'Dhanbad Central Colliery Unit-7', state: 'jharkhand',
+                mineType: 'underground', annualProduction: '4500000',
+                numberOfWorkers: '3200', overburdenRemoved: '15000000',
+                dieselConsumption: '8500000', electricityConsumption: '72000000',
+                ventilationKw: '4500', ventilationHours: '8500',
+                coalBurnedOnsite: '200', explosivesUsed: '180000',
+                coalWashed: '2000000', methaneVented: '35000000',
+                solarCapacityKw: '1500', internalTransportTonneKm: '40000000',
+                externalTransportTonneKm: '80000000', railTransportTonneKm: '450000000',
+                numVehicles: '120', existingForestArea: '350', greenBeltArea: '150',
+                plantationArea: '800', mineRestorationArea: '250'
+            };
+            Object.entries(demoData).forEach(([k, v]) => {
+                const el = document.getElementById(k);
+                if (el) el.value = v;
+            });
+            showToast('Demo mine loaded — Dhanbad Central Colliery', 'success');
+            showSection('calculator');
+        }
+
+        // ── COLLECT FORM DATA ────────────────────────────────────────────────
+        function collectFormData() {
+            const ids = [
+                'mineName', 'state', 'mineType', 'annualProduction', 'numberOfWorkers',
+                'overburdenRemoved', 'dieselConsumption', 'electricityConsumption',
+                'ventilationKw', 'ventilationHours', 'coalBurnedOnsite', 'explosivesUsed',
+                'coalWashed', 'methaneVented', 'solarCapacityKw', 'internalTransportTonneKm',
+                'externalTransportTonneKm', 'railTransportTonneKm', 'numVehicles',
+                'existingForestArea', 'greenBeltArea', 'plantationArea', 'mineRestorationArea'
+            ];
+            const data = {};
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) data[id] = el.value;
+            });
+            return data;
+        }
+
+        // ── API CALL ─────────────────────────────────────────────────────────
+        async function apiPost(endpoint, body) {
+            const res = await fetch(`${API_BASE}${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const json = await res.json();
+            if (!json.success) throw new Error(json.error || 'API error');
+            return json.data;
+        }
+
+        // ── MAIN ANALYSIS ────────────────────────────────────────────────────
+        let lastReport = null;
+
+        async function runFullAnalysis() {
+            const data = collectFormData();
+            if (!data.mineType || !data.annualProduction) {
+                showToast('Please fill in Mine Type and Annual Production first', 'error');
+                return;
+            }
+
+            document.getElementById('loadingOverlay').classList.add('active');
+
+            try {
+                const report = await apiPost('/emissions/full-report', data);
+                lastReport = report;
+                renderResults(report);
+                renderPathways(report);
+                document.getElementById('resultsNavBtn').style.opacity = '1';
+                document.getElementById('pathwaysNavBtn').style.opacity = '1';
+                showSection('results');
+                showToast('Analysis complete!', 'success');
+                if (window.setAIMineContext) window.setAIMineContext(report.summary);
+            } catch (err) {
+                // Fallback: compute client-side if backend not available
+                const fallback = computeFallback(data);
+                lastReport = fallback;
+                renderResults(fallback);
+                renderPathways(fallback);
+                showSection('results');
+                showToast('Results computed (offline mode)', 'success');
+            } finally {
+                document.getElementById('loadingOverlay').classList.remove('active');
+            }
+        }
+
+        // ── OFFLINE FALLBACK COMPUTATION ──────────────────────────────────────
+        function computeFallback(data) {
+            // Simplified emission factors
+            const ef = { diesel: 2.688, electricity: 0.82, anfo: 0.2, ch4_gwp: 28, ch4_density: 0.000717 };
+            const prod = parseFloat(data.annualProduction) || 0;
+            const workers = parseInt(data.numberOfWorkers) || 1;
+            const mineType = data.mineType || 'opencast';
+
+            const s1_diesel = (parseFloat(data.dieselConsumption) || 0) * ef.diesel / 1000;
+            const s1_explo = (parseFloat(data.explosivesUsed) || 0) * ef.anfo / 1000;
+            const s1_ob = (parseFloat(data.overburdenRemoved) || 0) * 0.0012 / 1000;
+            const s2_grid = (parseFloat(data.electricityConsumption) || 0) * ef.electricity / 1000;
+            const s2_vent = ((parseFloat(data.ventilationKw) || 0) * (parseFloat(data.ventilationHours) || 0)) * ef.electricity / 1000;
+            const s2_wash = (parseFloat(data.coalWashed) || 0) * 4.5 / 1000;
+            const s3_int = (parseFloat(data.internalTransportTonneKm) || 0) * 0.18 / 1000;
+            const s3_ext = (parseFloat(data.externalTransportTonneKm) || 0) * 0.165 / 1000;
+            const s3_rail = (parseFloat(data.railTransportTonneKm) || 0) * 0.025 / 1000;
+
+            const ch4Factor = mineType === 'underground' ? 15 : 0.3;
+            const fug_coal = prod * ch4Factor * ef.ch4_density * ef.ch4_gwp;
+            const fug_vent = (parseFloat(data.methaneVented) || 0) * ef.ch4_density * ef.ch4_gwp;
+
+            const s1 = s1_diesel + s1_explo + s1_ob;
+            const s2 = s2_grid + s2_vent + s2_wash;
+            const s3 = s3_int + s3_ext + s3_rail;
+            const fug = fug_coal + fug_vent;
+            const total = s1 + s2 + s3 + fug;
+
+            // Sinks
+            const stateRates = {
+                jharkhand: 7.2, chhattisgarh: 8.1, odisha: 7.8, madhya_pradesh: 6.9,
+                west_bengal: 8.4, telangana: 7.5, andhra_pradesh: 7.3, default: 7.5
+            };
+            const state = (data.state || 'default').replace(/\s/g, '_');
+            const sinkRate = stateRates[state] || 7.5;
+            const forestSink = (parseFloat(data.existingForestArea) || 0) * sinkRate * 0.6;
+            const plantSink = (parseFloat(data.plantationArea) || 0) * sinkRate;
+            const restoreSink = (parseFloat(data.mineRestorationArea) || 0) * sinkRate * 0.7;
+            const greenSink = (parseFloat(data.greenBeltArea) || 0) * sinkRate * 0.8;
+            const solarAvoid = (parseFloat(data.solarCapacityKw) || 0) * 8760 * 0.22 * (0.82 - 0.045) / 1000;
+            const totalSink = forestSink + plantSink + restoreSink + greenSink + solarAvoid;
+
+            const gap = Math.max(0, total - totalSink);
+            const coverage = Math.min(100, totalSink / (total || 1) * 100);
+
+            let status = coverage >= 100 ? 'Carbon Neutral' : coverage >= 75 ? 'Near Neutral' : coverage >= 50 ? 'Significant Gap' : 'Critical Gap';
+            let urgency = coverage >= 100 ? 'low' : coverage >= 75 ? 'medium' : coverage >= 50 ? 'high' : 'critical';
+
+            // Pathways
+            const evRed = total * 0.15;
+            const solarRed = total * 0.12;
+            const methRed = fug * 0.7;
+            const combined = evRed + solarRed + methRed * 0.5;
+
+            return {
+                emissions: {
+                    totals: { scope1: s1, scope2: s2, scope3: s3, fugitive: fug, total },
+                    perCapita: { perWorker: total / workers, perTonneCoal: total / (prod || 1), workers, annualProduction: prod },
+                    scope1: {
+                        diesel: { emission: s1_diesel * 1000, label: 'Diesel Combustion' },
+                        explosives: { emission: s1_explo * 1000, label: 'Explosives (ANFO)' },
+                        overburden: { emission: s1_ob * 1000, label: 'Overburden Removal' }
+                    },
+                    scope2: {
+                        gridElectricity: { emission: s2_grid * 1000, label: 'Grid Electricity' },
+                        ventilation: { emission: s2_vent * 1000, label: 'Ventilation' },
+                        coalWashing: { emission: s2_wash * 1000, label: 'Coal Washing' }
+                    },
+                    scope3: {
+                        internalTransport: { emission: s3_int * 1000, label: 'Internal Transport' },
+                        externalTransport: { emission: s3_ext * 1000, label: 'External Transport' },
+                        railTransport: { emission: s3_rail * 1000, label: 'Rail Transport' }
+                    },
+                    fugitive: {
+                        coalMethane: { emission: fug_coal * 1000, label: 'Fugitive CH₄ (Coal Seam)' },
+                        ventedMethane: { emission: fug_vent * 1000, label: 'Vented Methane' }
+                    },
+                    mineInfo: { mineType, annualProduction: prod, workers }
+                },
+                carbonSinks: {
+                    totalSink,
+                    sinks: {
+                        existingForest: { area: parseFloat(data.existingForestArea) || 0, total_sink: forestSink, label: 'Existing Forest' },
+                        newPlantation: { area: parseFloat(data.plantationArea) || 0, total_sink: plantSink, label: 'New Plantation' },
+                        mineRestoration: { area: parseFloat(data.mineRestorationArea) || 0, total_sink: restoreSink, label: 'Mine Restoration' },
+                        greenBelt: { area: parseFloat(data.greenBeltArea) || 0, total_sink: greenSink, label: 'Green Belt' },
+                        solarOffsets: { emission_avoided: solarAvoid, label: 'Solar Offsets' }
+                    }
+                },
+                gapAnalysis: {
+                    totalEmissions: total, totalSinks: totalSink, gap, coveragePercent: coverage,
+                    status, urgency,
+                    afforestationNeededHa: gap / sinkRate,
+                    estimatedAfforestationCost: (gap / sinkRate) * 45000,
+                    recommendations: [
+                        { priority: 'HIGH', category: 'Methane Capture', action: 'Install CMM capture system for fugitive methane', potential_reduction_pct: 18, estimated_cost_inr: 50000000, payback_years: 4 },
+                        { priority: 'HIGH', category: 'Electric Vehicles', action: 'Replace diesel fleet with electric haul trucks', potential_reduction_pct: 15, estimated_cost_inr: 150000000, payback_years: 6 },
+                        { priority: 'HIGH', category: 'Solar Energy', action: 'Install solar power to offset grid electricity', potential_reduction_pct: 12, estimated_cost_inr: 90000000, payback_years: 7 },
+                        { priority: 'MEDIUM', category: 'Energy Efficiency', action: 'Deploy VFD drives on fans, pumps & conveyors', potential_reduction_pct: 8, estimated_cost_inr: 15000000, payback_years: 3 },
+                        { priority: 'MEDIUM', category: 'Afforestation', action: `Plant ${Math.round(gap / sinkRate).toLocaleString()} hectares of native species`, offset_tco2e: gap, estimated_cost_inr: Math.round(gap / sinkRate) * 45000 },
+                        { priority: 'LOW', category: 'LED Lighting', action: 'Switch to LED lighting across infrastructure', potential_reduction_pct: 3, estimated_cost_inr: 8000000, payback_years: 2 }
+                    ]
+                },
+                pathways: {
+                    electricVehicles: { name: 'Electric Vehicle Fleet', reduction: evRed, reduction_pct: evRed / total * 100, emissions_after: total - evRed, capex_inr: (parseInt(data.numVehicles) || 50) * 5000000, payback_years: 6, timeline: '3–5 years' },
+                    methaneCapture: { name: 'Methane Capture & Utilization', reduction: methRed, reduction_pct: methRed / total * 100, emissions_after: total - methRed, capex_inr: 50000000, payback_years: 5, timeline: '2–3 years' },
+                    solarEnergy: { name: 'Solar Power Installation', reduction: solarRed, reduction_pct: solarRed / total * 100, emissions_after: total - solarRed, capex_inr: 90000000, payback_years: 7, timeline: '1–2 years' },
+                    combined: { name: 'Combined Strategy (Optimal)', reduction: combined, reduction_pct: Math.min(100, combined / total * 100), emissions_after: Math.max(0, total - combined), capex_inr: 290000000, payback_years: 8, timeline: '5–8 years' },
+                    afforestation: { name: 'Afforestation / Carbon Offset', hectares_needed: total / sinkRate, total_cost_inr: (total / sinkRate) * 45000, species: 'State-specific native species', reduction: total, reduction_pct: 100, emissions_after: 0, timeline: '10–20 years' }
+                },
+                carbonCredits: {
+                    creditsEarnable: combined,
+                    markets: {
+                        vcs: { name: 'VCS', rate_usd: 12.5, revenue_inr: combined * 12.5 * 83 },
+                        gold_standard: { name: 'Gold Standard', rate_usd: 18, revenue_inr: combined * 18 * 83 },
+                        indian_carbon_market: { name: 'Indian Carbon Market', rate_usd: 8, revenue_inr: combined * 8 * 83 }
+                    }
+                },
+                summary: {
+                    mineName: data.mineName || 'Coal Mine',
+                    mineType, state: data.state || 'India',
+                    totalEmissions_tCO2e: total,
+                    totalSinks_tCO2e: totalSink,
+                    gap_tCO2e: gap,
+                    coveragePercent: coverage, status,
+                    perWorker_tCO2e: total / workers,
+                    perTonneCoal_tCO2e: total / (prod || 1)
+                }
+            };
+        }
+
+        // ── FORMAT HELPERS ───────────────────────────────────────────────────
+        function fmt(n, dec = 0) {
+            if (n === undefined || n === null || isNaN(n)) return '—';
+            return parseFloat(n).toLocaleString('en-IN', { maximumFractionDigits: dec, minimumFractionDigits: dec });
+        }
+
+        function fmtCrore(n) {
+            if (!n) return '₹0';
+            const crore = n / 10000000;
+            if (crore >= 1) return `₹${fmt(crore, 1)} Cr`;
+            const lakh = n / 100000;
+            return `₹${fmt(lakh, 1)} L`;
+        }
+
+        // ── RENDER RESULTS ────────────────────────────────────────────────────
+        let charts = {};
+
+        function destroyCharts() {
+            Object.values(charts).forEach(c => { try { c.destroy(); } catch (e) { } });
+            charts = {};
+        }
+
+        function renderResults(report) {
+            destroyCharts();
+            const { emissions, carbonSinks, gapAnalysis, carbonCredits, summary } = report;
+            const tot = emissions.totals;
+            const pc = emissions.perCapita;
+
+            // Summary badge
+            const urgencyColor = { low: 'green', medium: 'warn', high: 'danger', critical: 'danger' };
+            document.getElementById('summaryBadge').innerHTML =
+                `<div class="gap-status ${urgencyColor[gapAnalysis.urgency] || 'danger'}">${gapAnalysis.status}</div>`;
+
+            const breakdown = [
+                ...Object.values(emissions.scope1 || {}).map(v => ({ label: v.label, val: v.emission / 1000, scope: 'Scope 1' })),
+                ...Object.values(emissions.scope2 || {}).map(v => ({ label: v.label, val: v.emission / 1000, scope: 'Scope 2' })),
+                ...Object.values(emissions.scope3 || {}).map(v => ({ label: v.label, val: v.emission / 1000, scope: 'Scope 3' })),
+                ...Object.values(emissions.fugitive || {}).map(v => ({ label: v.label, val: v.emission / 1000, scope: 'Fugitive' }))
+            ].filter(b => b.val > 0.001);
+
+            const html = `
+    <div class="kpi-row" style="margin-bottom:1.5rem;">
+      <div class="kpi-card amber">
+        <span class="kpi-icon">🏭</span>
+        <div class="kpi-val">${fmt(tot.total, 0)}</div>
+        <div class="kpi-unit">tCO₂e/year</div>
+        <div class="kpi-label">Total Emissions</div>
+      </div>
+      <div class="kpi-card green">
+        <span class="kpi-icon">🌿</span>
+        <div class="kpi-val">${fmt(carbonSinks.totalSink, 0)}</div>
+        <div class="kpi-unit">tCO₂e/year</div>
+        <div class="kpi-label">Total Carbon Sinks</div>
+      </div>
+      <div class="kpi-card red">
+        <span class="kpi-icon">⚠️</span>
+        <div class="kpi-val">${fmt(gapAnalysis.gap, 0)}</div>
+        <div class="kpi-unit">tCO₂e/year</div>
+        <div class="kpi-label">Neutrality Gap</div>
+      </div>
+      <div class="kpi-card blue">
+        <span class="kpi-icon">👤</span>
+        <div class="kpi-val">${fmt(pc.perWorker, 1)}</div>
+        <div class="kpi-unit">tCO₂e/worker</div>
+        <div class="kpi-label">Per Capita</div>
+      </div>
+      <div class="kpi-card gold">
+        <span class="kpi-icon">⛏️</span>
+        <div class="kpi-val">${fmt(pc.perTonneCoal, 3)}</div>
+        <div class="kpi-unit">tCO₂e/tonne coal</div>
+        <div class="kpi-label">Emission Intensity</div>
+      </div>
+    </div>
+
+    <!-- Gap Bar -->
+    <div class="gap-panel" style="margin-bottom:1.5rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <div class="chart-title" style="margin-bottom:4px;"><div class="dot" style="background:var(--amber)"></div> Carbon Balance Analysis</div>
+          <div style="font-size:0.85rem; color:var(--muted);">${summary.mineName} · ${(summary.state || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())} · ${summary.mineType}</div>
+        </div>
+        <div class="gap-status ${urgencyColor[gapAnalysis.urgency] || 'danger'}">${gapAnalysis.status}</div>
+      </div>
+      <div class="gap-bar-wrap">
+        <div class="gap-bar-labels">
+          <span>Sink Coverage: ${fmt(gapAnalysis.coveragePercent, 1)}%</span>
+          <span>Remaining Gap: ${fmt(gapAnalysis.gap, 0)} tCO₂e</span>
+        </div>
+        <div class="gap-bar">
+          <div class="gap-bar-fill ${gapAnalysis.coveragePercent >= 80 ? 'safe' : gapAnalysis.coveragePercent >= 50 ? 'warn' : 'danger'}"
+               id="gapBarFill" style="width:0%"></div>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap:1rem; margin-top:1.5rem;">
+        <div style="background:var(--surface); border-radius:8px; padding:1rem;">
+          <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:6px;">Afforestation Needed</div>
+          <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.5rem; color:var(--amber);">${fmt(gapAnalysis.afforestationNeededHa, 0)} ha</div>
+        </div>
+        <div style="background:var(--surface); border-radius:8px; padding:1rem;">
+          <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:6px;">Estimated Planting Cost</div>
+          <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.5rem; color:var(--amber);">${fmtCrore(gapAnalysis.estimatedAfforestationCost)}</div>
+        </div>
+        <div style="background:var(--surface); border-radius:8px; padding:1rem;">
+          <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:6px;">Carbon Credit Potential</div>
+          <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.5rem; color:var(--gold);">${fmtCrore(carbonCredits.markets.vcs?.revenue_inr)}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-row" style="margin-bottom:1.5rem;">
+      <div class="chart-panel">
+        <div class="chart-title"><div class="dot" style="background:var(--amber)"></div>Emission by Scope</div>
+        <div class="chart-container"><canvas id="scopeChart"></canvas></div>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-title"><div class="dot" style="background:var(--green)"></div>Carbon Balance</div>
+        <div class="chart-container"><canvas id="balanceChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Breakdown Table -->
+    <div class="chart-panel" style="margin-bottom:1.5rem;">
+      <div class="chart-title"><div class="dot" style="background:var(--blue-bright)"></div>Activity-wise Breakdown</div>
+      <table class="emission-table">
+        <thead>
+          <tr>
+            <th>Activity</th>
+            <th>Scope</th>
+            <th style="text-align:right">tCO₂e/yr</th>
+            <th style="text-align:right">%</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${breakdown.map(b => `
+            <tr>
+              <td>${b.label}</td>
+              <td><span style="font-family:'Space Mono',monospace; font-size:0.7rem; color:var(--muted)">${b.scope}</span></td>
+              <td class="amount">${fmt(b.val, 1)}</td>
+              <td class="pct">${fmt(b.val / tot.total * 100, 1)}%</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Carbon Sinks Breakdown -->
+    <div class="chart-panel" style="margin-bottom:1.5rem;">
+      <div class="chart-title"><div class="dot" style="background:var(--green)"></div>Carbon Sinks Detail</div>
+      <table class="emission-table">
+        <thead><tr><th>Sink Source</th><th style="text-align:right">tCO₂e/yr Sequestered</th></tr></thead>
+        <tbody>
+          ${Object.values(carbonSinks.sinks || {}).filter(s => (s.total_sink || s.emission_avoided) > 0).map(s => `
+            <tr>
+              <td>${s.label}</td>
+              <td class="amount" style="color:var(--green)">${fmt((s.total_sink || s.emission_avoided), 1)}</td>
+            </tr>
+          `).join('')}
+          <tr style="font-weight:700;">
+            <td>TOTAL SINKS</td>
+            <td class="amount" style="color:var(--green-bright)">${fmt(carbonSinks.totalSink, 1)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Recommendations -->
+    <div style="margin-bottom:1.5rem;">
+      <div class="chart-title" style="margin-bottom:1rem;"><div class="dot" style="background:var(--gold)"></div>Priority Recommendations</div>
+      <div class="rec-list">
+        ${(gapAnalysis.recommendations || []).map(r => `
+          <div class="rec-card">
+            <span class="rec-priority ${r.priority}">${r.priority}</span>
+            <div class="rec-body">
+              <div class="rec-category">${r.category}</div>
+              <div class="rec-action">${r.action}</div>
+            </div>
+            <div class="rec-meta">
+              ${r.potential_reduction_pct ? `<div>${r.potential_reduction_pct}% reduction</div>` : ''}
+              ${r.estimated_cost_inr ? `<div>${fmtCrore(r.estimated_cost_inr)}</div>` : ''}
+              ${r.payback_years ? `<div>${r.payback_years}yr payback</div>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- Carbon Credits -->
+    <div>
+      <div class="chart-title" style="margin-bottom:1rem;"><div class="dot" style="background:var(--gold)"></div>Carbon Credit Revenue Potential</div>
+      <div class="credit-grid">
+        ${Object.values(carbonCredits.markets || {}).map(m => `
+          <div class="credit-card">
+            <div class="credit-market">${m.name}</div>
+            <div class="credit-revenue">${fmtCrore(m.revenue_inr)}</div>
+            <div class="credit-rate">@ $${m.rate_usd}/tCO₂e · ${fmt(carbonCredits.creditsEarnable, 0)} credits</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+            document.getElementById('results-content').innerHTML = html;
+
+            // Animate gap bar
+            setTimeout(() => {
+                const fill = document.getElementById('gapBarFill');
+                if (fill) fill.style.width = Math.min(100, gapAnalysis.coveragePercent) + '%';
+            }, 200);
+
+            // Charts
+            const chartDefaults = {
+                plugins: { legend: { labels: { color: '#7a9bb5', font: { family: 'Rajdhani', size: 12 } } } },
+                scales: {}
+            };
+
+            const scopeCtx = document.getElementById('scopeChart');
+            if (scopeCtx) {
+                charts.scope = new Chart(scopeCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Scope 1 (Direct)', 'Scope 2 (Electricity)', 'Scope 3 (Transport)', 'Fugitive CH₄'],
+                        datasets: [{
+                            data: [tot.scope1, tot.scope2, tot.scope3, tot.fugitive],
+                            backgroundColor: ['#e76f51', '#457b9d', '#74b3ce', '#f4a261'],
+                            borderWidth: 2, borderColor: '#1e2535',
+                            hoverOffset: 12
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        cutout: '65%',
+                        plugins: {
+                            legend: { position: 'right', labels: { color: '#7a9bb5', font: { family: 'Rajdhani', size: 11 }, padding: 12 } },
+                            tooltip: { callbacks: { label: ctx => ` ${fmt(ctx.parsed, 0)} tCO₂e (${fmt(ctx.parsed / tot.total * 100, 1)}%)` } }
+                        }
+                    }
+                });
+            }
+
+            const balCtx = document.getElementById('balanceChart');
+            if (balCtx) {
+                charts.balance = new Chart(balCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Total Emissions', 'Carbon Sinks', 'Net Gap'],
+                        datasets: [{
+                            data: [tot.total, carbonSinks.totalSink, gapAnalysis.gap],
+                            backgroundColor: ['rgba(231,111,81,0.7)', 'rgba(46,196,182,0.7)', 'rgba(230,57,70,0.7)'],
+                            borderColor: ['#e76f51', '#2ec4b6', '#e63946'],
+                            borderWidth: 2, borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { color: '#7a9bb5', font: { family: 'Rajdhani' } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+                            y: {
+                                ticks: { color: '#7a9bb5', font: { family: 'Space Mono', size: 10 }, callback: v => fmt(v, 0) + ' t' },
+                                grid: { color: 'rgba(255,255,255,0.04)' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // ── RENDER PATHWAYS ───────────────────────────────────────────────────
+        function renderPathways(report) {
+            const { pathways, carbonCredits, emissions } = report;
+            const base = emissions.totals.total;
+
+            const icons = {
+                electricVehicles: { emoji: '⚡', bg: 'rgba(46,196,182,0.1)', color: 'var(--green)' },
+                methaneCapture: { emoji: '🔥', bg: 'rgba(244,162,97,0.1)', color: 'var(--amber)' },
+                solarEnergy: { emoji: '☀️', bg: 'rgba(255,209,102,0.1)', color: 'var(--gold)' },
+                combined: { emoji: '🔗', bg: 'rgba(116,179,206,0.1)', color: 'var(--blue-bright)' },
+                afforestation: { emoji: '🌳', bg: 'rgba(46,196,182,0.1)', color: 'var(--green)' }
+            };
+
+            const pathwayCardsHtml = Object.entries(pathways || {}).map(([key, p]) => {
+                const icon = icons[key] || { emoji: '🔧', bg: 'rgba(255,255,255,0.05)', color: 'var(--muted)' };
+                return `
+      <div class="pathway-card">
+        <div class="pathway-head">
+          <div class="pathway-icon" style="background:${icon.bg}; border:1px solid ${icon.color}40">${icon.emoji}</div>
+          <div class="pathway-name">${p.name}</div>
+        </div>
+        <div class="pathway-body">
+          ${p.reduction_pct != null ? `
+            <div class="pathway-stat">
+              <span class="key">Emission Reduction</span>
+              <span class="val green">${fmt(p.reduction_pct, 1)}%</span>
+            </div>
+          ` : ''}
+          <div class="pathway-stat">
+            <span class="key">CO₂e Reduced</span>
+            <span class="val amber">${fmt(p.reduction, 0)} t/yr</span>
+          </div>
+          ${p.emissions_after != null ? `
+            <div class="pathway-stat">
+              <span class="key">Emissions After</span>
+              <span class="val">${fmt(p.emissions_after, 0)} t/yr</span>
+            </div>
+          ` : ''}
+          ${p.capex_inr ? `
+            <div class="pathway-stat">
+              <span class="key">Capital Cost</span>
+              <span class="val red">${fmtCrore(p.capex_inr)}</span>
+            </div>
+          ` : ''}
+          ${p.total_cost_inr ? `
+            <div class="pathway-stat">
+              <span class="key">Total Cost</span>
+              <span class="val red">${fmtCrore(p.total_cost_inr)}</span>
+            </div>
+          ` : ''}
+          ${p.payback_years ? `
+            <div class="pathway-stat">
+              <span class="key">Payback</span>
+              <span class="val">${p.payback_years} years</span>
+            </div>
+          ` : ''}
+          ${p.hectares_needed ? `
+            <div class="pathway-stat">
+              <span class="key">Land Required</span>
+              <span class="val amber">${fmt(p.hectares_needed, 0)} ha</span>
+            </div>
+          ` : ''}
+          ${p.species ? `
+            <div class="pathway-stat">
+              <span class="key">Species</span>
+              <span class="val" style="font-size:0.75rem; font-family:inherit">${p.species}</span>
+            </div>
+          ` : ''}
+          <div class="pathway-stat">
+            <span class="key">Timeline</span>
+            <span class="val">${p.timeline || '—'}</span>
+          </div>
+          <div class="reduction-bar">
+            <div class="reduction-fill" style="width:0%" data-target="${Math.min(100, p.reduction_pct || 0)}"></div>
+          </div>
+        </div>
+      </div>
+    `;
+            }).join('');
+
+            document.getElementById('pathways-content').innerHTML = `
+    <div style="margin-bottom:2rem;">
+      <div class="info-box">
+        <span class="info-icon">💡</span>
+        <span>Pathway simulations show potential emission reductions for each strategy independently. The <strong>Combined Strategy</strong> achieves the maximum reduction by integrating EV fleet, methane capture, and solar energy.</span>
+      </div>
+      <div class="kpi-row" style="margin-bottom:2rem;">
+        <div class="kpi-card amber">
+          <span class="kpi-icon">🏭</span>
+          <div class="kpi-val">${fmt(base, 0)}</div>
+          <div class="kpi-unit">tCO₂e/year</div>
+          <div class="kpi-label">Baseline Emissions</div>
+        </div>
+        <div class="kpi-card green">
+          <span class="kpi-icon">🎯</span>
+          <div class="kpi-val">${fmt((pathways.combined?.reduction_pct || 0), 1)}%</div>
+          <div class="kpi-unit">reduction possible</div>
+          <div class="kpi-label">Best Combined Strategy</div>
+        </div>
+        <div class="kpi-card gold">
+          <span class="kpi-icon">💰</span>
+          <div class="kpi-val">${fmtCrore(carbonCredits.markets?.vcs?.revenue_inr || 0)}</div>
+          <div class="kpi-unit">annual revenue</div>
+          <div class="kpi-label">Carbon Credit Potential</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pathway-grid" id="pathwayGrid">${pathwayCardsHtml}</div>
+
+    <div class="chart-panel" style="margin-top:2rem;">
+      <div class="chart-title"><div class="dot" style="background:var(--amber)"></div>Pathway Comparison</div>
+      <div class="chart-container" style="height:280px;"><canvas id="pathwayChart"></canvas></div>
+    </div>
+  `;
+
+            // Animate reduction bars
+            setTimeout(() => {
+                document.querySelectorAll('.reduction-fill[data-target]').forEach(el => {
+                    el.style.width = el.dataset.target + '%';
+                });
+            }, 200);
+
+            // Pathway comparison chart
+            const pCtx = document.getElementById('pathwayChart');
+            if (pCtx) {
+                const pLabels = Object.values(pathways).map(p => p.name);
+                const pData = Object.values(pathways).map(p => p.reduction_pct || 0);
+                charts.pathway = new Chart(pCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: pLabels,
+                        datasets: [{
+                            label: 'Emission Reduction %',
+                            data: pData,
+                            backgroundColor: ['rgba(46,196,182,0.7)', 'rgba(244,162,97,0.7)', 'rgba(255,209,102,0.7)', 'rgba(116,179,206,0.7)', 'rgba(46,196,182,0.5)'],
+                            borderColor: ['#2ec4b6', '#f4a261', '#ffd166', '#74b3ce', '#2ec4b6'],
+                            borderWidth: 2, borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: {
+                                ticks: { color: '#7a9bb5', callback: v => v + '%' },
+                                grid: { color: 'rgba(255,255,255,0.04)' }, max: 110
+                            },
+                            y: { ticks: { color: '#7a9bb5', font: { family: 'Rajdhani', size: 11 } }, grid: { color: 'rgba(255,255,255,0.04)' } }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Check API health on load
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(3000) });
+                if (res.ok) showToast('Backend API connected', 'success');
+            } catch (e) {
+                // Backend not available, will use offline mode
+            }
+        });
+    </script>
+    <script src="assets/ai-chat.js"></script>
+</body>
+
+</html>
