@@ -111,7 +111,7 @@ backend_groq_final/server.js
 
 ## 👨‍💻 Author
 
-Pamula Sai Shashank Pandu  
+Pamula Sai Shashank 
 B.Tech – Computer Science Engineering  
 
 ---
