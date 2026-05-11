@@ -4,7 +4,7 @@
  */
 
 (function initAIChat() {
-  const API_BASE = 'http://localhost:3001/api';
+  const API_BASE = 'https://carboniq-3cxa.onrender.com/api';
   let conversationHistory = [];
   let mineContext = null;
   let isOpen = false;
